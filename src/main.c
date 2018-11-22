@@ -16,6 +16,7 @@
 # include <limits.h>
 # include "isosurface.h"
 # include <errno.h>
+#include <ctype.h>
 
 int flag = 0;
 
@@ -38,6 +39,12 @@ float rot_inc[3], trans_inc[3];
 float rot_matrix[3];
 double rot_matrix_int[3];
 double rot_matrix_inc[3];
+
+#define MAX_ENTER 1024
+#define MAX_ISOVALUE 9
+
+double* isovalueArray;
+
 
 void processSpecialKeys(int key, int x, int y);
 
@@ -324,7 +331,60 @@ XYZ VertexInterp(float isolevel, XYZ p1, XYZ p2, float valp1, float valp2) {
     return (p);
 }
 
+// Note: This function returns a pointer to a substring of the original string.
+// If the given string was allocated dynamically, the caller must not overwrite
+// that pointer with the returned value, since the original pointer must be
+// deallocated using the same allocator with which it was allocated.  The return
+// value must NOT be deallocated using free() etc.
+char *trimwhitespace(char *str) {
+    char *end;
+
+    // Trim leading space
+    while (isspace((unsigned char) *str)) str++;
+
+    if (*str == 0)  // All spaces?
+        return str;
+
+    // Trim trailing space
+    end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char) *end)) end--;
+
+    // Write new null terminator character
+    end[1] = '\0';
+
+    return str;
+}
+
+int takeInput(char *str) {
+    char *found;
+    int i = 0;
+    while ((found = strsep(&str, ",")) != NULL && i < MAX_ISOVALUE) {
+        found = trimwhitespace(found);
+//        printf("found %s\n", found);
+        double value = strtod(found, NULL);
+        if (value != 0) {
+//            printf("found %lf\n", value);
+            *(isovalueArray + i) = value;
+            i++;
+        }
+    }
+    return i > 0 ? 0 : 1;
+}
+
 int main(int argc, char **argv) {
+
+    char input[MAX_ENTER];
+    isovalueArray = calloc(MAX_ISOVALUE, sizeof(double));
+    while (1) {
+        printf("Please enter the isovalues(up to %d) between 0.01 and 5.2 separated by a comma(e.g. 0.01,1.03): ",
+               MAX_ISOVALUE);
+        fgets(input, MAX_ENTER, stdin);
+        if (takeInput(input)) {
+            continue;
+        }
+        break;
+    }
+
     x = clock();
     memset(rot, 0, 3 * 4);
     memset(trans, 0, 3 * 4);
@@ -353,6 +413,7 @@ int main(int argc, char **argv) {
     glutKeyboardFunc(keyboard);
     glutReshapeFunc(reshape);
     glutMainLoop();
+    free(isovalueArray);
     return 0;
 }
 
@@ -382,7 +443,7 @@ void display(void) {
     Draw(list1, 0, 0);
     glutSwapBuffers();
     time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
-    printf("Display %f\n", time_in_seconds);
+//    printf("Display %f\n", time_in_seconds);
     glutPostRedisplay();
 }
 
