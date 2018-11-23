@@ -50,11 +50,23 @@ int selected_index = -1;
 
 void processSpecialKeys(int key, int x, int y);
 
-void SetMaterial(GLfloat mat[4]) {
-    int i;
-    for (i = 0; i < 4; i++)
-        curMat[i] = mat[i];
-}
+GLfloat materials[9][4] = {
+        {1,   0,   0,   1},
+        {0,   1,   0,   1},
+        {0,   0,   1,   1},
+        {0.5, 0,   0,   1},
+        {0,   0.5, 0,   1},
+        {0,   0,   0.1, 1},
+        {0.2, 0.3, 0.1, 1},
+        {0,   0.5, 0.5, 1},
+        {1,   0.1, 0.3, 1},
+};
+
+//void SetMaterial(GLfloat mat[4]) {
+//    int i;
+//    for (i = 0; i < 4; i++)
+//        curMat[i] = mat[i];
+//}
 
 NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int maxZ, int current_index) {
     int i, j, k, m, num;
@@ -140,15 +152,15 @@ NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int max
                         n[num].z = norm[2];
                     }
                     tmpNode = (NODE *) malloc(sizeof(NODE));
-                    for (num = 0; num < 3; num++) {
+                    for (num = 0; num < 4; num++) {
                         tmpNode->t.p[num].x = t[m].p[num].x / maxX;
                         tmpNode->t.p[num].y = t[m].p[num].y / maxY;
                         tmpNode->t.p[num].z = t[m].p[num].z / maxZ;
                         tmpNode->n[num] = n[num];
                     }
                     tmpNode->depth = GetDepth(t[m]);
-                    for (num = 0; num < 4; num++)
-                        tmpNode->mat[num] = curMat[num];
+                    for (num = 0; num < 3; num++)
+                        tmpNode->mat[num] = materials[current_index][num];
                     tmpNode->next = NULL;
                     tmpNode->sibling = NULL;
                     //printf("Calling insert\n");
@@ -231,8 +243,9 @@ void DrawIsoSurface(NODE *listset) {
 
     glBegin(GL_TRIANGLES);
     while (temp != NULL) {
-        //glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, temp->mat);
-        //glMaterialfv(GL_FRONT_AND_BACK, GL_COLOR_INDEXES, temp->mat);
+//        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, temp->mat);
+//        glMaterialfv(GL_FRONT_AND_BACK, GL_COLOR_INDEXES, temp->mat);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, temp->mat);
         for (i = 0; i < 3; i++) {
             n = temp->n[i];
             p = temp->t.p[i];
@@ -523,7 +536,7 @@ void display(void) {
     glCullFace(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glRotatef(angle, 1.0, 1.0, 1.0);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, material);
+//    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, material);
     Draw(list1, 0, 0);
     glutSwapBuffers();
     time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
@@ -680,7 +693,7 @@ void reshape(int w, int h) {
 }
 
 void init(void) {
-    GLfloat material[] = {0.0, 0, 0.5};
+//    GLfloat material[] = {0.0, 0, 0.5};
     static GLfloat light_position0[] = {1.0, 1.0, 1.0, 1.0};
     static GLfloat light_ambient[] = {0.0, 0.0, 1.0, 0.0};
     static GLfloat light_position1[] = {1.0, 0.0, 2.0, 1.0};
@@ -689,7 +702,7 @@ void init(void) {
     glClearDepth(1.0f);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
-    SetMaterial(material);
+//    SetMaterial(material);
 
     glShadeModel(GL_SMOOTH);
 
