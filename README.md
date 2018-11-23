@@ -32,7 +32,7 @@ Press "a" to add 0.02 to the isovalue:
 ![](doc/2_isovalues_higher_isovalue.png)
 
 Enter three isovalues(0.01, 0.03, 1.03):
-![](doc/4_isovalues.png)
+![](doc/three_different_isovalues.png)
 
 Enter four 0.01 isovalues:
 ![](doc/4_isovalues.png)
