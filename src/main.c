@@ -392,8 +392,15 @@ int takeInput(char *str) {
     return i > 0 ? 0 : 1;
 }
 
-int main(int argc, char **argv) {
+void test(int testSize) {
+    isovalueArray = malloc(testSize * sizeof(double));
+    for (int i = 0; i < testSize; ++i) {
+        *(isovalueArray + i) = 0.02;
+    }
+    isovalue_len = testSize;
+}
 
+int interaction() {
     char input[MAX_ENTER];
     isovalueArray = calloc(MAX_ISOVALUE, sizeof(double));
     while (1) {
@@ -405,13 +412,23 @@ int main(int argc, char **argv) {
         }
         break;
     }
+}
 
-//    int testSize = 5;
-//    isovalueArray = malloc(testSize * sizeof(double));
-//    for (int i = 0; i < testSize; ++i) {
-//        *(isovalueArray + i) = 0.01 + (i * 0.02);
-//    }
-//    isovalue_len = testSize;
+int main(int argc, char **argv) {
+
+    interaction();
+//    test(9);
+
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitWindowSize(1200, 1200);
+    glutInitWindowPosition(0, 0);
+    glutCreateWindow(argv[0]);
+    init();
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouseClick);
+    glutReshapeFunc(reshape);
 
     x = clock();
     memset(rot, 0, 3 * 4);
@@ -431,16 +448,6 @@ int main(int argc, char **argv) {
     printf("Creating list %f\n", time_in_seconds);
     x = clock();
 
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(1200, 1200);
-    glutInitWindowPosition(0, 0);
-    glutCreateWindow(argv[0]);
-    init();
-    glutDisplayFunc(display);
-    glutKeyboardFunc(keyboard);
-    glutMouseFunc(mouseClick);
-    glutReshapeFunc(reshape);
     glutMainLoop();
     free(isovalueArray);
     return 0;
