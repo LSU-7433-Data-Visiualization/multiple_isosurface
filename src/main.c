@@ -451,14 +451,16 @@ int main(int argc, char **argv) {
     flag = 0;
     loaddata();
 
+    printf("Isovalue length is %d\n", isovalue_len);
+
     time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
-    printf("Loading data %f\n", time_in_seconds);
+    printf("Loading data cost %f seconds\n", time_in_seconds);
     x = clock();
 
     loadlist();
 
     time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
-    printf("Creating list %f\n", time_in_seconds);
+    printf("Creating list cost %f seconds\n", time_in_seconds);
     x = clock();
 
     glutMainLoop();
@@ -540,7 +542,7 @@ void display(void) {
     Draw(list1, 0, 0);
     glutSwapBuffers();
     time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
-//    printf("Display %f\n", time_in_seconds);
+    printf("Display %f\n", time_in_seconds);
     glutPostRedisplay();
 }
 
