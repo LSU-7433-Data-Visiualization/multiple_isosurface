@@ -537,6 +537,7 @@ void display(void) {
     glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
     glRotatef(angle, 1.0, 1.0, 1.0);
 //    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, material);
     Draw(list1, 0, 0);
