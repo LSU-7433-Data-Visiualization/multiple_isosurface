@@ -43,9 +43,10 @@ double rot_matrix_inc[3];
 #define MAX_ENTER 1024
 #define MAX_ISOVALUE 9
 
-double* isovalueArray;
+double *isovalueArray;
 
 int isovalue_len;
+int selected_index = -1;
 
 void processSpecialKeys(int key, int x, int y);
 
@@ -55,8 +56,14 @@ void SetMaterial(GLfloat mat[4]) {
         curMat[i] = mat[i];
 }
 
-NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int maxZ) {
-    int i, j, k, m, num, inc = 1;
+NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int maxZ, int current_index) {
+    int i, j, k, m, num;
+    int inc;
+    if (current_index == selected_index) {
+        inc = 1;
+    } else {
+        inc = 2;
+    }
     int numOfTriangles;
     float d, norm[3], dx1, dx2, dy1, dy2, dz1, dz2;
     XYZ n[3];
@@ -432,6 +439,7 @@ int main(int argc, char **argv) {
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouseClick);
     glutReshapeFunc(reshape);
     glutMainLoop();
     free(isovalueArray);
@@ -567,6 +575,90 @@ void keyboard(unsigned char key, int x, int y) {
     }
 }
 
+void mouseClick(int button, int state, int x, int y) {
+    int segment_w, segment_h, n_h, n_w;
+    switch (button) {
+        case GLUT_LEFT_BUTTON:
+            switch (state) {
+                case GLUT_DOWN:
+                    switch (isovalue_len) {
+                        case 1:
+                            segment_w = g_w;
+                            segment_h = g_h;
+                            break;
+                        case 2:
+                            segment_w = (int) (g_w * 0.5);
+                            segment_h = g_h;
+                            break;
+                        case 3:
+                        case 4:
+                            segment_w = (int) (g_w * 0.5);
+                            segment_h = (int) (g_h * 0.5);
+                            break;
+                        case 5:
+                        case 6:
+                            segment_w = (int) (g_w / 3);
+                            segment_h = (int) (g_h / 2);
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                            segment_w = (int) (g_w / 3);
+                            segment_h = (int) (g_h / 3);
+                            break;
+                        default:
+                            perror("invalid isovalue_len");
+                            return;
+                    }
+                    n_h = y / segment_h;
+                    n_w = x / segment_w;
+                    switch (isovalue_len) {
+                        case 1:
+                            selected_index = 0;
+                            break;
+                        case 2:
+                            selected_index = n_w;
+                            break;
+                        case 3:
+                        case 4:
+                            selected_index = 2 * n_h + n_w;
+                            break;
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                            selected_index = 3 * n_h + n_w;
+                            break;
+                        default:
+                            perror("invalid isovalue_len");
+                            return;
+                    }
+//                    printf("x: %d, y: %d, select_index: %d\n", x, y, selected_index);
+                    x = clock();
+                    clearlist();
+                    time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
+                    printf("Clearing List %f\n", time_in_seconds);
+                    x = clock();
+                    loadlist();
+                    time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
+                    printf("Creating list1 %f\n", time_in_seconds);
+
+                    glutPostRedisplay();
+                    break;
+                case GLUT_UP:
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case GLUT_RIGHT_BUTTON:
+            break;
+        default:
+            break;
+    }
+}
+
 
 void reshape(int w, int h) {
     g_w = w;
@@ -660,7 +752,7 @@ void loaddata() {
 void loadlist() {
     NODE *tmpNode;
     for (int i = 0; i < isovalue_len; i++) {
-        tmpNode = MarchingCube(data1, (float) *(isovalueArray + i), nx, ny, nz);
+        tmpNode = MarchingCube(data1, (float) *(isovalueArray + i), nx, ny, nz, i);
         if (list1 == NULL) {
             list1 = tmpNode;
         } else {

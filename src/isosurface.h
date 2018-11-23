@@ -326,7 +326,7 @@ static int triTable[256][16] =
 {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 
-NODE* MarchingCube(float ***data, float isoValue, int maxX, int maxY, int maxZ);
+NODE* MarchingCube(float ***data, float isoValue, int maxX, int maxY, int maxZ, int current_index);
 int Polygonise(GRIDCELL grid,float isolevel,TRIANGLE *triangles);
 XYZ VertexInterp(float isolevel, XYZ p1, XYZ p2,float valp1, float valp2);
 void DrawIsoSurface(NODE *list);
@@ -355,6 +355,7 @@ float GetDepth(TRIANGLE t);
   	
 void display(void);
 void keyboard(unsigned char key, int x, int y);
+void mouseClick(int button, int state, int x, int y);
 void reshape(int w, int h);
 void init(void);
 float *** Load(const char *fileName, float ***datatemp);
