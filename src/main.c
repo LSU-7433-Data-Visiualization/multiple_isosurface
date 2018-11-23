@@ -45,6 +45,7 @@ double rot_matrix_inc[3];
 
 double* isovalueArray;
 
+int isovalue_len;
 
 void processSpecialKeys(int key, int x, int y);
 
@@ -54,15 +55,16 @@ void SetMaterial(GLfloat mat[4]) {
         curMat[i] = mat[i];
 }
 
-NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int maxZ, NODE *list) {
+NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int maxZ) {
     int i, j, k, m, num, inc = 1;
     int numOfTriangles;
     float d, norm[3], dx1, dx2, dy1, dy2, dz1, dz2;
     XYZ n[3];
     GRIDCELL v;
     TRIANGLE t[5];
+    NODE *list = NULL;
     NODE *tmpNode;
-    //printf("isovalue = %f,  maxX = %d, maxY = %d, maxZ = %d\n",isoValue, maxX, maxY, maxZ);
+//    printf("isovalue = %f,  maxX = %d, maxY = %d, maxZ = %d\n", isoValue, maxX, maxY, maxZ);
     //x = clock();
     for (i = 0; i < maxX - inc; i += inc) {
         for (j = 0; j < maxY - inc; j += inc) {
@@ -141,6 +143,7 @@ NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int max
                     for (num = 0; num < 4; num++)
                         tmpNode->mat[num] = curMat[num];
                     tmpNode->next = NULL;
+                    tmpNode->sibling = NULL;
                     //printf("Calling insert\n");
                     list = Insert(list, tmpNode);
                 }
@@ -191,16 +194,24 @@ float GetDepth(TRIANGLE t) {
     return z;
 }
 
-NODE *DeleteList(NODE *listset) {
+void DeleteList(NODE *listset) {
+    NODE *head = listset;
     NODE *temp;
-    while (listset) {
-        temp = listset->next;
-        free(listset);
-        listset = NULL;
-        //delete(listset);
-        listset = temp;
+    NODE *siblingHead;
+    while (head->sibling != NULL) {
+        siblingHead = head->sibling;
+        head->sibling = head->sibling->sibling;
+        while (siblingHead != NULL) {
+            temp = siblingHead->next;
+            free(siblingHead);
+            siblingHead = temp;
+        }
     }
-    return listset;
+    while (head != NULL) {
+        temp = head->next;
+        free(head);
+        head = temp;
+    }
 }
 
 void DrawIsoSurface(NODE *listset) {
@@ -208,7 +219,9 @@ void DrawIsoSurface(NODE *listset) {
     XYZ n, p;
     NODE *temp;
     temp = listset;
+
     glPushMatrix();
+
     glBegin(GL_TRIANGLES);
     while (temp != NULL) {
         //glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, temp->mat);
@@ -368,6 +381,7 @@ int takeInput(char *str) {
             i++;
         }
     }
+    isovalue_len = i;
     return i > 0 ? 0 : 1;
 }
 
@@ -384,6 +398,13 @@ int main(int argc, char **argv) {
         }
         break;
     }
+
+//    int testSize = 5;
+//    isovalueArray = malloc(testSize * sizeof(double));
+//    for (int i = 0; i < testSize; ++i) {
+//        *(isovalueArray + i) = 0.01 + (i * 0.02);
+//    }
+//    isovalue_len = testSize;
 
     x = clock();
     memset(rot, 0, 3 * 4);
@@ -405,7 +426,7 @@ int main(int argc, char **argv) {
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(1024, 1024);
+    glutInitWindowSize(1200, 1200);
     glutInitWindowPosition(0, 0);
     glutCreateWindow(argv[0]);
     init();
@@ -420,12 +441,60 @@ int main(int argc, char **argv) {
 
 void Draw(NODE *list, int i, int j) {
     int hi = 1, wi = 1;
-    glViewport(j * g_w / wi, i * g_h / hi, 0.8 * g_w / wi, 0.8 * g_h / hi);
-    glPushMatrix();
-    glTranslatef(-0.5, -0.5, -0.5);
-    DrawIsoSurface(list);
-    glPopMatrix();
-    glutWireCube(1.0);
+//    glViewport(j * g_w / wi, i * g_h / hi, 1 * g_w / wi, 1 * g_h / hi);
+    NODE *head = list;
+    GLsizei segment_w, segment_h;
+
+    switch (isovalue_len) {
+        case 1:
+            segment_w = g_w;
+            segment_h = g_h;
+            break;
+        case 2:
+            segment_w = (GLsizei) (g_w * 0.5);
+            segment_h = g_h;
+            break;
+        case 3:
+        case 4:
+            segment_w = (GLsizei) (g_w * 0.5);
+            segment_h = (GLsizei) (g_h * 0.5);
+            break;
+        case 5:
+        case 6:
+            segment_w = (GLsizei) (g_w / 3);
+            segment_h = (GLsizei) (g_h / 2);
+            break;
+        case 7:
+        case 8:
+        case 9:
+            segment_w = (GLsizei) (g_w / 3);
+            segment_h = (GLsizei) (g_h / 3);
+            break;
+        default:
+            perror("invalid isovalue_len");
+            return;
+    }
+    int k = 0;
+    while (head != NULL) {
+        if (isovalue_len == 1) {
+            glViewport(0, 0, segment_w, segment_h);
+        } else if (isovalue_len == 2) {
+            glViewport(k * segment_w, 0, segment_w, segment_h);
+        } else if (isovalue_len <= 4) {
+            glViewport((k % 2) * segment_w, (1 - k / 2) * segment_h, segment_w, segment_h);
+        } else if (isovalue_len <= 6) {
+            glViewport((k % 3) * segment_w, (1 - k / 3) * segment_h, segment_w, segment_h);
+        } else if (isovalue_len <= 9) {
+            glViewport((k % 3) * segment_w, (2 - k / 3) * segment_h, segment_w, segment_h);
+        }
+        glPushMatrix();
+        glTranslatef((GLfloat) -0.5, (GLfloat) -0.5, (GLfloat) -0.5);
+        DrawIsoSurface(head);
+        glPopMatrix();
+        glutWireCube(1);
+        head = head->sibling;
+        k++;
+    }
 }
 
 long diff;
@@ -455,8 +524,12 @@ void keyboard(unsigned char key, int x, int y) {
             exit(0);
             break;
         case 'a':
-            isoval = isoval + 0.02;
-            printf("\niso value %f\n", isoval);
+            for (int i = 0; i < isovalue_len; ++i) {
+                *(isovalueArray + i) = *(isovalueArray + i) + 0.02;
+                printf("\n%d: iso value %f\n", i + 1, *(isovalueArray + i));
+            }
+//            isoval = isoval + 0.02;
+//            printf("\niso value %f\n", isoval);
             x = clock();
             clearlist();
             time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
@@ -469,8 +542,12 @@ void keyboard(unsigned char key, int x, int y) {
             glutPostRedisplay();
             break;
         case 's':
-            isoval = isoval - 0.02;
-            printf("\niso value %f\n", isoval);
+            for (int i = 0; i < isovalue_len; ++i) {
+                *(isovalueArray + i) = *(isovalueArray + i) - 0.02;
+                printf("\n%d: iso value %f\n", i + 1, *(isovalueArray + i));
+            }
+//            isoval = isoval - 0.02;
+//            printf("\niso value %f\n", isoval);
             clearlist();
             time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
             printf("Clearing List %f\n", time_in_seconds);
@@ -581,10 +658,23 @@ void loaddata() {
 }
 
 void loadlist() {
-    list1 = MarchingCube(data1, isoval, nx, ny, nz, list1);
+    NODE *tmpNode;
+    for (int i = 0; i < isovalue_len; i++) {
+        tmpNode = MarchingCube(data1, (float) *(isovalueArray + i), nx, ny, nz);
+        if (list1 == NULL) {
+            list1 = tmpNode;
+        } else {
+            NODE *tmpHead = list1;
+            while (tmpHead->sibling != NULL) {
+                tmpHead = tmpHead->sibling;
+            }
+            tmpHead->sibling = tmpNode;
+        }
+    }
 }
 
 void clearlist() {
-    list1 = DeleteList(list1);
+    DeleteList(list1);
+    list1 = NULL;
 }
 

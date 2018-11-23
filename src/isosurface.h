@@ -30,8 +30,8 @@ typedef struct Node {
 	GLfloat mat[4];
 	float depth;
 	struct Node *next;
+	struct Node *sibling;
 } NODE;
-
 
 
 static int edgeTable[256]={
@@ -326,12 +326,12 @@ static int triTable[256][16] =
 {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 
-NODE* MarchingCube(float ***data, float isoValue, int maxX, int maxY, int maxZ, NODE * list);
+NODE* MarchingCube(float ***data, float isoValue, int maxX, int maxY, int maxZ);
 int Polygonise(GRIDCELL grid,float isolevel,TRIANGLE *triangles);
 XYZ VertexInterp(float isolevel, XYZ p1, XYZ p2,float valp1, float valp2);
 void DrawIsoSurface(NODE *list);
 void SetMaterial(GLfloat mat[4]);
-NODE *DeleteList(NODE *list);
+void DeleteList(NODE *list);
 
 static int curStep = 0;
 static int numSteps; 
@@ -348,7 +348,7 @@ static NODE *list1 = NULL;
 
 
 static GLfloat curMat[4] = {1.0, 0.0, 0.0, 1.0};
-float isoval = 0.01;
+//float isoval = 0.01;
 
 NODE *Insert(NODE *list, NODE *tmpNode);
 float GetDepth(TRIANGLE t);
