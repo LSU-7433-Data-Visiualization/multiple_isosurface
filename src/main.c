@@ -413,7 +413,7 @@ void test(int testSize) {
     isovalue_len = testSize;
 }
 
-int interaction() {
+void interaction() {
     char input[MAX_ENTER];
     isovalueArray = calloc(MAX_ISOVALUE, sizeof(double));
     while (1) {
