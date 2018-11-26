@@ -34,7 +34,7 @@ Press "a" to add 0.02 to the isovalue(0.03, 0.05):
 Enter three isovalues(0.01, 0.03, 1.03):
 ![](doc/3_isovalues_0.01_0.02_1.03.png)
 
-Enter four 0.01 isovalues(0.07,1.07,2.07,3.07):
+Enter four isovalues(0.07,1.07,2.07,3.07):
 ![](doc/4_isovalues_0.07_1.07_2.07_3.07.png)
 
 Enter six isovalues(0.01,0.51,1.01,1.51,3.4,4.2):
