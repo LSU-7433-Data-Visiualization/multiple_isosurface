@@ -16,35 +16,35 @@ resolution
 
 # Results
 
-Enter one 0.01 isovalues:
-![](doc/one_isovalue.png)
+Enter one 0.02 isovalues:
+![](doc/1_isovalue_0.02.png)
 
-Press "a" to add 0.02 to the isovalue: 
-![](doc/one_isovalue_higer_isovalue.png)
+Press "a" to add 0.02 to the isovalue(0.04): 
+![](doc/1_isovalue_0.02_press_a_0.04.png)
 
-Enter two 0.01 isovalues:
-![](doc/2_isovalues.png)
+Enter two isovalues(0.01, 0.03):
+![](doc/2_isovalues_0.01_0.03.png)
 
-Click left view:
-![](doc/2_isovalues_left_higer_resolution.png)
+Enter two same isovalues (0.04, 0.04) and click the left view:
+![](doc/2_isovalues_0.04_left_clicked.png)
 
-Press "a" to add 0.02 to the isovalue: 
-![](doc/2_isovalues_higher_isovalue.png)
+Press "a" to add 0.02 to the isovalue(0.03, 0.05): 
+![](doc/2_isovalues_0.01_0.03_with_a_pressed.png)
 
 Enter three isovalues(0.01, 0.03, 1.03):
-![](doc/three_different_isovalues.png)
+![](doc/3_isovalues_0.01_0.02_1.03.png)
 
-Enter four 0.01 isovalues:
-![](doc/4_isovalues.png)
+Enter four 0.01 isovalues(0.07,1.07,2.07,3.07):
+![](doc/4_isovalues_0.07_1.07_2.07_3.07.png)
 
-Enter six 0.01 isovalues:
-![](doc/6_isovalues.png)
+Enter six isovalues(0.01,0.51,1.01,1.51,3.4,4.2):
+![](doc/6_isovalues_0.01_0.51_1.01_1.51_3.4_4.2.png)
 
 Press "k" or "l" to rotate view:
 ![](doc/6_isovalues_rotated.png)
 
-Enter nine 0.01 isovalues:
-![](doc/9_isovalues.png)
+Enter nine isovalues(0.01,0.02,0.05,1.03,1.5,2.4,3.6,0.04,1.8):
+![](doc/9_isovalues_0.01_0.02_0.05_1.03_1.5_2.4_3.6_0.04_1.8.png)
 
 # Performance
 
