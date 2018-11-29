@@ -152,7 +152,7 @@ NODE *MarchingCube(float ***dataset, float isoValue, int maxX, int maxY, int max
                         n[num].z = norm[2];
                     }
                     tmpNode = (NODE *) malloc(sizeof(NODE));
-                    for (num = 0; num < 4; num++) {
+                    for (num = 0; num < 3; num++) {
                         tmpNode->t.p[num].x = t[m].p[num].x / maxX;
                         tmpNode->t.p[num].y = t[m].p[num].y / maxY;
                         tmpNode->t.p[num].z = t[m].p[num].z / maxZ;
@@ -543,7 +543,7 @@ void display(void) {
     Draw(list1, 0, 0);
     glutSwapBuffers();
     time_in_seconds = (double) (clock() - x) / CLOCKS_PER_SEC;
-    printf("Display %f\n", time_in_seconds);
+//    printf("Display %f\n", time_in_seconds);
     glutPostRedisplay();
 }
 
